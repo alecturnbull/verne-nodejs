@@ -63,9 +63,9 @@ PlaceMaker.prototype.findPlaces = function (bookId, chapterId, callback){
     				  var name = parsedLocs['placeDetails']['place']['name'];
     				  var referenceText = references['reference']['text'];
     				  var myLocation = {
-  				        'loc'   : [coords.latitude, coords.longitude]
-  				      , 'name'  : name
-  				      , 'text'  : referenceText
+  				        loc   : [coords.latitude, coords.longitude]
+  				      , name  : name
+  				      , text  : referenceText
   				    }
   				    Librarian.addLocationToChapter(bookId, chapterId, myLocation, function(err){
   			        if(!err){
@@ -94,9 +94,9 @@ PlaceMaker.prototype.findPlaces = function (bookId, chapterId, callback){
     				    var referenceText = placesByNumber[refId];
   				    
     				    var myLocation = {
-    				        'loc'   : [coords.latitude, coords.longitude]
-    				      , 'name'  : name
-    				      , 'text'  : referenceText
+    				        loc   : [coords.latitude, coords.longitude]
+    				      , name  : name
+    				      , text  : referenceText
     				    }
     				    Librarian.addLocationToChapter(bookId, chapterId, myLocation, function(err){
   				        if(!err){
