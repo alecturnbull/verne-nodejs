@@ -1,0 +1,28 @@
+div
+  p Delete this Book
+  form(method='post', action='/books/#{id}/delete')
+    input(type='submit', value='Delete')
+    
+h1 #{title}
+h2 #{author}
+
+#chapters 
+  h3 Chapters :
+  != partial('chapter', {id: id, collection: book.chapters})
+
+div
+  h3 Add a Chapter
+  form(method='post', action='/books/addChapter')
+    input(type='hidden', name='_id', value='#{id}')
+    
+    div
+      span Chapter Number :
+      input(type='text', name='chapNumber', id='addChapterNumber')
+    div
+      span Content :
+      textarea(name='content', rows='5', id='addChapterContent')
+    #addChapterSubmit
+      input(type='submit', value='Send')
+
+a(href='/books/#{id}/edit') Edit
+      
