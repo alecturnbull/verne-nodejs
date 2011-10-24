@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/totallynewdb');
+mongoose.connect('mongodb://localhost/library');
 
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
@@ -8,7 +8,7 @@ var Schema = mongoose.Schema
 // LOCATION MODEL
 var Location = new Schema({
     loc         : [Number, Number]
-  , name          : String
+  , name          : { type: String, unique: true }
   , created_at    : Date
   , books_in_loc  : [BooksInLoc]
 });

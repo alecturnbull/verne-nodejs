@@ -41,6 +41,10 @@ var Atlas = new Atlas();
 var PlaceMaker = require('./placemaker').PlaceMaker;
 var PlaceMaker = new PlaceMaker();
 
+
+
+
+
 ///////////////////////////////
 // Routes 
 ///////////////////////////////
@@ -55,8 +59,28 @@ app.get('/', function(req, res){
 	          books: books
 	        }
 	});
-  })
+  });
 });
+
+
+// Locations
+
+app.get('/locations', function(rec, res){
+  Atlas.findAll(function(err, locations){
+    res.render('location_list', {
+      locals: {
+        title: 'Locations',
+        locations: locations
+      }
+    });
+  });
+});
+
+
+
+// Books 
+
+
 
 //new
 app.get('/books/new', function(req, res){
@@ -119,6 +143,11 @@ app.post('/books/:id/delete', function(req, res){
 });
 
 
+
+
+// Chapters 
+
+
 //add chapter
 app.post('/books/addChapter', function(req, res){
 	Librarian.addChapterToBook(req.body._id, {
@@ -138,12 +167,16 @@ app.post('/books/:id/deleteChapter/:chapId', function(req, res){
 });
 
 
-//find Locations
+// Discover Locations Via Placemaker
 app.post('/books/:id/findLocations/:chapId', function(req, res){
   PlaceMaker.findPlaces(req.param('id'), req.param('chapId'), function(err){
     res.redirect('/books/' + req.param('id'));
   });
 });
+
+
+
+
 
 
 ///////////////////////////////

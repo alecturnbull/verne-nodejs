@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/antibook');
+mongoose.connect('mongodb://localhost/library');
 
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
@@ -39,6 +39,15 @@ Librarian.prototype.findAll = function(callback) {
   Book.find({}, function (err, books) {
     callback( null, books )
   });  
+};
+
+//Find book by slug
+Librarian.prototype.findBySlug = function(slug, callback) {
+  Book.find({ book_slug : slug }, function(err, book){
+    if(!err) {
+      callback(null, book);
+    }
+  });
 };
 
 //Find book by ID
