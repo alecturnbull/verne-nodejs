@@ -45,8 +45,33 @@ Librarian.prototype.findAll = function(callback) {
 Librarian.prototype.findBySlug = function(slug, callback) {
   Book.find({ book_slug : slug }, function(err, book){
     if(!err) {
-      callback(null, book);
+      callback(null, book[0]);
     }
+  });
+};
+
+//Update book by slug
+Librarian.prototype.updateBySlug = function(slug, body, callback) {
+  Book.find({ book_slug : slug }, function (err, book) {
+    if (!err) {
+      var book = book[0];
+	    book.title = body.title;
+  	  book.author = body.author;
+  	  book.slug = body.slug;
+  	  book.save(function (err) {
+  	    callback();
+  	  });
+	}
+  });
+};
+
+//Delete a book by slug
+Librarian.prototype.deleteBookBySlug = function(slug, callback){
+  Book.find({ book_slug : slug }, function (err, book) {
+    if (!err) {
+      var book = book[0];
+	  	book.remove(callback);
+		}
   });
 };
 
@@ -74,7 +99,7 @@ Librarian.prototype.updateById = function(id, body, callback) {
 
 //Create a new book
 Librarian.prototype.save = function(params, callback) {
-  var book = new Book({title: params['title'], author: params['author'], book_slug: params['author'].replace(/ /g,"_") + "--" + params['title'].replace(/ /g,"_"), created_at: new Date()});
+  var book = new Book({title: params['title'], author: params['author'], book_slug: params['author'].replace(/ /g,"_") + "—" + params['title'].replace(/ /g,"_"), created_at: new Date()});
   book.save(function (err) {
     if(err) {
       console.log("Book not added \n" + err );
@@ -92,6 +117,49 @@ Librarian.prototype.deleteBook = function(id, callback){
 	  	book.remove(callback);
 		}
   });
+};
+
+//Add chapter to book by slug
+Librarian.prototype.addChapterToBookBySlug = function(slug, chapter, callback) {
+  Book.find({ book_slug : slug }, function (err, book) {
+    if(err){
+	    callback(error);
+	  }
+    else {
+      var book = book[0];
+	    book.chapters.push(chapter);
+  	  book.save(function (err) {
+  	    if(!err){
+  		    callback();
+  	    }	
+	  });
+    }
+  });
+};
+
+
+//Delete a chapter by slug
+Librarian.prototype.deleteChapterFromBookBySlug = function(slug, chapterId, callback){
+  Book.find({ book_slug : slug }, function (err, book) {
+		if(!err) {
+		  var book = book[0];
+			book.chapters.id(chapterId).remove();
+			book.save(function(err){
+				callback();
+			});
+		}
+	});
+};
+
+// Find a chapter by slug
+Librarian.prototype.findChapterInBookBySlug = function(slug, chapterId, callback){
+  Book.find({ book_slug : slug }, function (err, book) {
+    if(!err) {
+      var book = book[0];
+      var chapter = book.chapters.id(chapterId);
+      callback(null, chapter);
+    }
+  })
 };
 
 //Add chapter to book
@@ -134,17 +202,17 @@ Librarian.prototype.findChapterInBook = function(bookId, chapterId, callback){
 };
 
 // Add Locations
-// NEED TO ADD MIDDLEWARE TO PREVENT DUPLICATES
-Librarian.prototype.addLocationToChapter = function(bookId, chapterId, location, callback){
-	this.findById(bookId, function(error, book) {
-		if(error){
-			callback(error);
+Librarian.prototype.addLocationToChapter = function(slug, chapterId, location, callback){
+	  Book.find({ book_slug : slug }, function (err, book) {
+		if(err){
+			callback(err);
 		} else{
+		  var book = book[0];
 			var chap = book.chapters.id(chapterId);
-			console.log(chap);
 			chap.locations.push(location);
 			book.save(function(err){
 			  if(!err){
+			    console.log(location.text + " has been saved to this Chapter")
 			    callback();
 			  }
 			});
@@ -152,6 +220,23 @@ Librarian.prototype.addLocationToChapter = function(bookId, chapterId, location,
 	});
 };
 
-
+// Remove Locations
+Librarian.prototype.clearLocationsInChapter = function(slug, chapterId, callback){
+	  Book.find({ book_slug : slug }, function (err, book) {
+		if(err){
+			callback(err);
+		} else{
+		  var book = book[0];
+			var chap = book.chapters.id(chapterId);
+			chap.locations = [];
+			book.save(function(err){
+			  if(!err){
+			    console.log("Locations removed from this chapter")
+			    callback();
+			  }
+			});
+		}
+	});
+};
 
 exports.Librarian = Librarian;

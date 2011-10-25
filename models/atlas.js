@@ -14,9 +14,9 @@ var Location = new Schema({
 });
 
 var BooksInLoc = new Schema({
-    bookId      : Number
-  , chapters_in_loc  : [ChaptersInLoc] 
-  , created_at  : Date
+    book_slug       : String
+  , chapters_in_loc : [ChaptersInLoc] 
+  , created_at      : Date
 });
 
 var ChaptersInLoc = new Schema({
@@ -46,9 +46,14 @@ Atlas.prototype.findById = function(id, callback) {
 };
 
 //Create a new location
-Atlas.prototype.save = function(params, callback) {
-  var location = new Location({lat: params['lat'], lng: params['lng'], name: params['name'], created_at: new Date()});
+Atlas.prototype.save = function(location, slug, chapId, callback) {
+  var location = new Location({
+      lat: location['lat']
+    , lng: location['lng']
+    , name: location['name']
+    , created_at: new Date()});
   location.save(function (err) {
+    console.log(location.name + " has been saved to Locations");
     callback();
   });
 };
@@ -60,40 +65,6 @@ Atlas.prototype.deleteLocation = function(id, callback){
 	  	location.remove(callback);
 		}
   });
-};
-
-//Add bookId to location
-Atlas.prototype.addBookToLocation = function(locationId, book_in_loc, callback) {
-  this.findById(locationId, function(error, location) {
-    if(error){
-	    callback(error);
-	  }
-	  else {
-	    location.books_in_location.push(book_in_loc);
-  	  location.save(function (err) {
-  	    if(!err){
-  		    callback();
-  	    }	
-	  });
-    }
-  });
-};
-
-//Add Chapter to book_in_loc
-Atlas.prototype.addChapterToBookInLoc = function(locationId, bookId, chapter_in_loc, callback) {
-  this.findById(locationId, function(error, location) {
-		if(error){
-			callback(error);
-		} else{
-			var book = location.books_in_loc.id(bookId);
-			book.chapters_in_loc.push(chapter_in_loc);
-			book.save(function(err){
-			  if(!err){
-			    callback();
-			  }
-			});
-		}
-	});
 };
 
 exports.Atlas = Atlas;

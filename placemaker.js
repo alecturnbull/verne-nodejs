@@ -21,9 +21,9 @@ var PlaceMaker = function(){};
 
 PlaceMaker.prototype.apikey = "QH09bmrV34EalhLLfJMIScuOw2CibQ9y_3CVr8iIlP4SMTc1tHHLVFt.Yd2hYFPeyoevJk0bG5tW2F.CVP6slxWwqUlsLgw-";
 
-PlaceMaker.prototype.findPlaces = function (bookId, chapterId, callback){
+PlaceMaker.prototype.findPlaces = function (slug, chapterId, callback){
 	
-  Librarian.findChapterInBook(bookId, chapterId, function(err, chapter){
+  Librarian.findChapterInBookBySlug(slug, chapterId, function(err, chapter){
     var myContent = chapter.content;
     	  
     // Build the post string from an object
@@ -67,14 +67,18 @@ PlaceMaker.prototype.findPlaces = function (bookId, chapterId, callback){
   				      , name  : name
   				      , text  : referenceText
   				    }
-  				    Librarian.addLocationToChapter(bookId, chapterId, myLocation, function(err){
-  			        if(!err){
-  			          console.log(myLocation.text + " has been added to Chapter " + chapter.chapNumber);
+  				    var myChapterData = {
+  				        book_slug : slug
+  				      , chapId    : chapterId
+  				    }
+  				    Librarian.addLocationToChapter(slug, chapterId, myLocation, function(err){
+  			        if(err){
+  			          console.log(err);
   			        }
   			      });
   			      Atlas.save(myLocation, function(err){
-  			        if(!err){
-  			          console.log(myLocation.name + " has been added to Locations");
+  			        if(err){
+  			          console.log(err);
   			        }
   			      });
   			      
@@ -98,14 +102,14 @@ PlaceMaker.prototype.findPlaces = function (bookId, chapterId, callback){
     				      , name  : name
     				      , text  : referenceText
     				    }
-    				    Librarian.addLocationToChapter(bookId, chapterId, myLocation, function(err){
-  				        if(!err){
-  				          console.log(myLocation.text + " has been added to Chapter " + chapter.chapNumber);
+    				    Librarian.addLocationToChapter(slug, chapterId, myLocation, function(err){
+  				        if(err){
+  				         console.log(err);
   				        }
   				      });
   				      Atlas.save(myLocation, function(err){
-    			        if(!err){
-    			          console.log(myLocation.name + " has been added to Locations");
+    			        if(err){
+    			          console.log(err);
     			        }
     			      });
     				  }
