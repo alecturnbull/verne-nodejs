@@ -1,0 +1,11 @@
+.chapter
+  h4 Chapter number #{chapter.chapNumber}
+  form(method='post', action='/books/#{slug}/deleteChapter/#{chapter._id}')
+    input(type='submit', value='Delete this Chapter')
+  form(method='post', action='/books/#{slug}/findLocations/#{chapter._id}')
+    input(type='submit', value='Find Locations')
+  form(method='post', action='/books/#{slug}/clearLocations/#{chapter._id}')
+    input(type='submit', value='Clear Locations')
+  .chapter-content!= chapter.content
+  != partial('chapterLocation', {collection: chapter.locations })
+  
