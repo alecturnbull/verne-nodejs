@@ -46,7 +46,7 @@ Atlas.prototype.findById = function(id, callback) {
 };
 
 //Create a new location
-Atlas.prototype.save = function(location, slug, chapId, callback) {
+Atlas.prototype.save = function(location, callback) {
   var location = new Location({
       lat: location['lat']
     , lng: location['lng']
