@@ -1,4 +1,9 @@
 .book
   .title #{location.name}
   .created_at #{location.created_at}
+- location.books.forEach(function(book){
+  p= book.book_slug
+  p= book.chapters_in_loc
+
+- })
 

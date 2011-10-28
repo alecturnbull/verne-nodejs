@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/library');
+mongoose.connect('mongodb://localhost/library2');
 
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
@@ -43,18 +43,17 @@ Librarian.prototype.findAll = function(callback) {
 
 //Find book by slug
 Librarian.prototype.findBySlug = function(slug, callback) {
-  Book.find({ book_slug : slug }, function(err, book){
+  Book.findOne({ book_slug : slug }, function(err, book){
     if(!err) {
-      callback(null, book[0]);
+      callback(null, book);
     }
   });
 };
 
 //Update book by slug
 Librarian.prototype.updateBySlug = function(slug, body, callback) {
-  Book.find({ book_slug : slug }, function (err, book) {
+  Book.findOne({ book_slug : slug }, function (err, book) {
     if (!err) {
-      var book = book[0];
 	    book.title = body.title;
   	  book.author = body.author;
   	  book.slug = body.slug;
@@ -67,9 +66,8 @@ Librarian.prototype.updateBySlug = function(slug, body, callback) {
 
 //Delete a book by slug
 Librarian.prototype.deleteBookBySlug = function(slug, callback){
-  Book.find({ book_slug : slug }, function (err, book) {
+  Book.findOne({ book_slug : slug }, function (err, book) {
     if (!err) {
-      var book = book[0];
 	  	book.remove(callback);
 		}
   });
@@ -121,12 +119,11 @@ Librarian.prototype.deleteBook = function(id, callback){
 
 //Add chapter to book by slug
 Librarian.prototype.addChapterToBookBySlug = function(slug, chapter, callback) {
-  Book.find({ book_slug : slug }, function (err, book) {
+  Book.findOne({ book_slug : slug }, function (err, book) {
     if(err){
 	    callback(error);
 	  }
     else {
-      var book = book[0];
 	    book.chapters.push(chapter);
   	  book.save(function (err) {
   	    if(!err){
@@ -140,9 +137,8 @@ Librarian.prototype.addChapterToBookBySlug = function(slug, chapter, callback) {
 
 //Delete a chapter by slug
 Librarian.prototype.deleteChapterFromBookBySlug = function(slug, chapterId, callback){
-  Book.find({ book_slug : slug }, function (err, book) {
+  Book.findOne({ book_slug : slug }, function (err, book) {
 		if(!err) {
-		  var book = book[0];
 			book.chapters.id(chapterId).remove();
 			book.save(function(err){
 				callback();
@@ -153,9 +149,8 @@ Librarian.prototype.deleteChapterFromBookBySlug = function(slug, chapterId, call
 
 // Find a chapter by slug
 Librarian.prototype.findChapterInBookBySlug = function(slug, chapterId, callback){
-  Book.find({ book_slug : slug }, function (err, book) {
+  Book.findOne({ book_slug : slug }, function (err, book) {
     if(!err) {
-      var book = book[0];
       var chapter = book.chapters.id(chapterId);
       callback(null, chapter);
     }
@@ -203,11 +198,10 @@ Librarian.prototype.findChapterInBook = function(bookId, chapterId, callback){
 
 // Add Locations
 Librarian.prototype.addLocationToChapter = function(slug, chapterId, location, callback){
-	  Book.find({ book_slug : slug }, function (err, book) {
+	  Book.findOne({ book_slug : slug }, function (err, book) {
 		if(err){
 			callback(err);
 		} else{
-		  var book = book[0];
 			var chap = book.chapters.id(chapterId);
 			chap.locations.push(location);
 			book.save(function(err){
@@ -222,11 +216,10 @@ Librarian.prototype.addLocationToChapter = function(slug, chapterId, location, c
 
 // Remove Locations
 Librarian.prototype.clearLocationsInChapter = function(slug, chapterId, callback){
-	  Book.find({ book_slug : slug }, function (err, book) {
+	  Book.findOne({ book_slug : slug }, function (err, book) {
 		if(err){
 			callback(err);
 		} else{
-		  var book = book[0];
 			var chap = book.chapters.id(chapterId);
 			chap.locations = [];
 			book.save(function(err){

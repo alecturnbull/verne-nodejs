@@ -44,6 +44,67 @@ PlaceMaker.prototype.findPlaces = function (slug, chapterId, callback){
             'Content-Length': post_data.length
         }
     };
+    
+
+
+    
+    var addRelevantInfoToLocations = function(myLocation, name, slug, chapterId) {
+      
+      var saveBookAndChapter = function(name, slug, chapterId){
+        Atlas.saveBookToLocation(name, slug, function(err){
+          if(!err){
+            Atlas.saveChapterToLocation(name, slug, chapterId, function(err, location){
+              for(i=0; i<location.books.length; i++){
+                console.log(location.books[i]);
+              }
+            });
+          }
+       });
+      };
+      
+      // first we check whether the location is in the DB
+      Atlas.findByName(name, function(err, location) {
+        if(location){
+          console.log("Location already in system")
+          var books = location.books;
+          if(books){
+            var bookInLocation = false;
+            for(i=0; i < books.length; i++) {
+              var book = books[i];
+              if(book.book_slug == slug) {
+                bookInLocation = true;
+              }
+            }
+            if(bookInLocation) {
+              Atlas.saveChapterToLocation(name, slug, chapterId, function(err, location){
+                for(i=0; i<location.books.length; i++){
+                  console.log(location.books[i]);
+                }
+              });
+            } 
+            else {
+              saveBookAndChapter(name, slug, chapterId);
+            }  
+          } 
+          else {
+            console.log('no books recorded yet');
+            // there are no books recorded yet
+            saveBookAndChapter(name, slug, chapterId);
+          }
+        } 
+        else {
+          console.log("Location does not yet exist in system, adding...");
+          // We add the location, then the book, then the chapter
+          Atlas.save(myLocation, function(err){
+            saveBookAndChapter(name, slug, chapterId, function(err, location){
+              for(i=0; i<location.books.length; i++){
+                console.log(location.books[i]);
+              }
+            });
+		      });
+        }
+      });
+    };
 
     var post_req = http.request(post_options, function(res) {
         res.setEncoding('utf8');
@@ -76,13 +137,8 @@ PlaceMaker.prototype.findPlaces = function (slug, chapterId, callback){
   			          console.log(err);
   			        }
   			      });
-  			      Atlas.save(myLocation, function(err){
-  			        if(err){
-  			          console.log(err);
-  			        }
-  			      });
   			      
-  			      
+  			      addRelevantInfoToLocations(myLocation, name, slug, chapterId);	      
     				} 
     				else {
     				  var placesByNumber = {};
@@ -107,11 +163,7 @@ PlaceMaker.prototype.findPlaces = function (slug, chapterId, callback){
   				         console.log(err);
   				        }
   				      });
-  				      Atlas.save(myLocation, function(err){
-    			        if(err){
-    			          console.log(err);
-    			        }
-    			      });
+                addRelevantInfoToLocations(myLocation, name, slug, chapterId);	 
     				  }
     				}
   				}

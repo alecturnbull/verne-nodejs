@@ -146,7 +146,7 @@ app.get('/locations', function(req, res){
 ///////////////////////////////
 
 //new book
-app.get('/books/new', authCheck, function(req, res){
+app.get('/books/new', function(req, res){
   res.render('book_new', {
              locals: {
                title: 'New Book'
@@ -155,7 +155,7 @@ app.get('/books/new', authCheck, function(req, res){
 });
 
 //create book
-app.post('/books/new', authCheck, function(req, res){
+app.post('/books/new', function(req, res){
   Librarian.save({
 		title: req.param('title'),
     author: req.param('author')
@@ -180,7 +180,7 @@ app.get('/books/:slug', function(req, res){
 });
 
 //edit book
-app.get('/books/:slug/edit', authCheck, function(req, res){
+app.get('/books/:slug/edit', function(req, res){
 	Librarian.findBySlug(req.param('slug'), function(err, book){
 		res.render('book_edit', {
 			locals: {
@@ -194,14 +194,14 @@ app.get('/books/:slug/edit', authCheck, function(req, res){
 });
 
 //update book
-app.post('/books/:slug/edit', authCheck, function(req, res){
+app.post('/books/:slug/edit', function(req, res){
 	Librarian.updateBySlug(req.param('slug'), req.body, function(err, book){
 		res.redirect('/');
 	});
 });
 
 //delete book
-app.post('/books/:slug/delete', authCheck, function(req, res){
+app.post('/books/:slug/delete', function(req, res){
 	Librarian.deleteBookBySlug(req.param('slug'), function(err, docs){
 		res.redirect('/');
 	});
@@ -214,7 +214,7 @@ app.post('/books/:slug/delete', authCheck, function(req, res){
 ///////////////////////////////
 
 //add chapter
-app.post('/books/addChapter', authCheck, function(req, res){
+app.post('/books/addChapter', function(req, res){
 	Librarian.addChapterToBookBySlug(req.body.slug, {
 		chapNumber	: req.body.chapNumber,
 		content			: req.body.content,
@@ -233,14 +233,14 @@ app.post('/books/:slug/deleteChapter/:chapId', authCheck, function(req, res){
 
 
 // Discover Locations Via Placemaker
-app.post('/books/:slug/findLocations/:chapId', authCheck, function(req, res){
+app.post('/books/:slug/findLocations/:chapId', function(req, res){
   PlaceMaker.findPlaces(req.param('slug'), req.param('chapId'), function(err){
     res.redirect('/books/' + req.param('slug'));
   });
 });
 
 // Clear Locations in Chapter
-app.post('/books/:slug/clearLocations/:chapId', authCheck, function(req, res){
+app.post('/books/:slug/clearLocations/:chapId', function(req, res){
   Librarian.clearLocationsInChapter(req.param('slug'), req.param('chapId'), function(err){
     res.redirect('/books/' + req.param('slug'));
   });

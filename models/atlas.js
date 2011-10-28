@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/library');
+mongoose.connect('mongodb://localhost/library2');
 
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
@@ -10,7 +10,7 @@ var Location = new Schema({
     loc         : [Number, Number]
   , name          : { type: String, unique: true }
   , created_at    : Date
-  , books_in_loc  : [BooksInLoc]
+  , books  : [BooksInLoc]
 });
 
 var BooksInLoc = new Schema({
@@ -36,6 +36,15 @@ Atlas.prototype.findAll = function(callback) {
   });  
 };
 
+// Find location by name
+Atlas.prototype.findByName = function(name, callback){
+  Location.findOne({ name: name }, function(err, location) {
+    if(!err){
+      callback(null, location);
+    }
+  });
+};
+
 //Find location by ID
 Atlas.prototype.findById = function(id, callback) {
   Location.findById(id, function (err, location) {
@@ -48,8 +57,7 @@ Atlas.prototype.findById = function(id, callback) {
 //Create a new location
 Atlas.prototype.save = function(location, callback) {
   var location = new Location({
-      lat: location['lat']
-    , lng: location['lng']
+      loc : location['loc']
     , name: location['name']
     , created_at: new Date()});
   location.save(function (err) {
@@ -66,5 +74,53 @@ Atlas.prototype.deleteLocation = function(id, callback){
 		}
   });
 };
+
+// Save Book in Location
+Atlas.prototype.saveBookToLocation = function(name, slug, callback){
+  Location.findOne({ name: name }, function(err, location){
+    var myBook = {
+        book_slug       : slug
+      , createdAt       : new Date()
+    }
+    if(!err){
+      location.books.push(myBook);
+      location.save(function(err){
+			  if(!err){
+			    console.log(slug + " has been saved to this Chapter");
+			    callback();
+			  }
+			});
+    }
+  });
+}
+
+
+// Save Chapter in Location
+// To Do: Poorly executed. Change slug to Id to take advantage of mongoose's nested .id method
+Atlas.prototype.saveChapterToLocation = function(name, slug, chapId, callback){
+  Location.findOne({ name: name }, function(err, location){
+    var bookList = location.books;
+    for(i=0; i < bookList.length; i++) {
+        if(bookList[i]['book_slug'] == slug) {
+          bookList[i].chapters_in_loc.push({
+              chapterId       : chapId
+            , created_at      : new Date()
+          });
+        } 
+      }
+    location.books = bookList;
+    location.save(function(err){
+      if(err){
+        console.log("Error! " + err);
+      }
+		  if(!err){
+		    callback(null, location);
+		  }
+		});
+
+  });
+}
+
+
 
 exports.Atlas = Atlas;
