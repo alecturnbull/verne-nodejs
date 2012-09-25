@@ -4,87 +4,40 @@ mongoose.connect('mongodb://localhost/library');
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
-// BOOK MODEL
+// INDEX MODEL
 
-var ChapterLocations = new Schema({
-    loc         : [Number, Number]
-	, name        : String
-	, text				: String
-	, created_at	: Date	
-});
-
-var Chapters = new Schema({
-    chapNumber : Number
-  , content    : String
-  , created_at : Date
-	, locations	 : [ChapterLocations]
-});
-
-var Book = new Schema({
-    author      : String
-  , title       : String
-  , book_slug   : {type: String, unique: true, lowercase: true }
+var Reference = new Schema({
+    chapter     : String
+  , location    : String
+  , loc_text    : String
   , created_at  : Date
-  , chapters    : [Chapters]
 });
 
 
-mongoose.model('Book', Book);
-var Book = mongoose.model('Book');
+mongoose.model('Reference', Reference);
+var Reference = mongoose.model('Reference');
 
-var Librarian = function(){};
+var Index = function(){};
 
-//Find all Books
-Librarian.prototype.findAll = function(callback) {
-  Book.find({}, function (err, books) {
-    callback( null, books )
+//Find all References
+Index.prototype.findAll = function(callback) {
+  Reference.find({}, function (err, refs) {
+    callback( null, refs );
   });  
 };
 
-//Find book by slug
-Librarian.prototype.findBySlug = function(slug, callback) {
-  Book.findOne({ book_slug : slug }, function(err, book){
-    if(!err) {
-      callback(null, book);
-    }
-  });
-};
-
-//Update book by slug
-Librarian.prototype.updateBySlug = function(slug, body, callback) {
-  Book.findOne({ book_slug : slug }, function (err, book) {
+//Find Reference by ID
+Index.prototype.findById = function(id, callback) {
+  Reference.findById(id, function (err, ref) {
     if (!err) {
-	    book.title = body.title;
-  	  book.author = body.author;
-  	  book.slug = body.slug;
-  	  book.save(function (err) {
-  	    callback();
-  	  });
+	  callback(null, ref);
 	}
   });
 };
 
-//Delete a book by slug
-Librarian.prototype.deleteBookBySlug = function(slug, callback){
-  Book.findOne({ book_slug : slug }, function (err, book) {
-    if (!err) {
-	  	book.remove(callback);
-		}
-  });
-};
-
-//Find book by ID
-Librarian.prototype.findById = function(id, callback) {
-  Book.findById(id, function (err, book) {
-    if (!err) {
-	  callback(null, book);
-	}
-  });
-};
-
-//Update book by ID
-Librarian.prototype.updateById = function(id, body, callback) {
-  Book.findById(id, function (err, book) {
+//Update Reference by ID
+Index.prototype.updateById = function(id, body, callback) {
+  Reference.findById(id, function (err, ref) {
     if (!err) {
 	  book.title = body.title;
 	  book.author = body.author;
